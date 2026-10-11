@@ -2,68 +2,43 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#081017" />
-  <title>Trip Guide · Phuket 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9fb" />
+  <title>Пхукет · 13–27 ноября</title>
   <script src="https://telegram.org/js/telegram-web-app.js?64"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    :root{--bg:#081017;--panel:#101a23;--panel2:#16232d;--text:#f5fbff;--muted:#91a1ae;--accent:#58e0b4;--line:rgba(255,255,255,.08)}
-    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 90% 0,rgba(88,224,180,.12),transparent 30%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    .app{max-width:760px;margin:auto;padding-bottom:90px} header{position:sticky;top:0;z-index:999;background:rgba(8,16,23,.93);backdrop-filter:blur(14px);display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
-    small{color:var(--accent);font-weight:800;letter-spacing:.14em} h1{font-size:24px;margin:3px 0 0}.hero,.card{margin:12px 18px;border:1px solid var(--line);background:var(--panel);border-radius:22px;padding:18px}.hero{background:linear-gradient(135deg,rgba(88,224,180,.14),rgba(112,162,255,.07)),var(--panel)}
-    .hero h2{font-size:28px;margin:6px 0}.muted,p{color:var(--muted)} .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 18px 10px}.chip{white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:10px 12px;border-radius:14px}.chip.active{background:var(--accent);color:#062017;font-weight:800}
-    .row{display:flex;justify-content:space-between;gap:12px}.actions{display:flex;gap:8px;margin-top:12px}.actions>*{flex:1}.btn,.btn2{border-radius:14px;padding:12px 14px;font-weight:800}.btn{border:0;background:var(--accent);color:#052016}.btn2{border:1px solid var(--line);background:var(--panel2);color:#fff}
-    .tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:11px;background:rgba(255,255,255,.05);padding:6px 8px;border-radius:999px}.section-title{margin:14px 18px 6px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px}.place{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:14px;min-height:130px}.place h3{margin-top:0}
-    #map{height:calc(100vh - 150px);min-height:520px;margin:12px 18px;border-radius:22px;overflow:hidden}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);display:grid;grid-template-columns:repeat(4,1fr);padding:7px;background:rgba(8,16,23,.96);border-top:1px solid var(--line);z-index:999}.nav button{border:0;background:none;color:#778997;padding:8px}.nav button.active{color:var(--accent)}
-    .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#101a23;color:#fff}
-  </style>
+  <link rel="preconnect" href="https://images.pexels.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<div class="app">
-<header><div><small>TRIP GUIDE</small><h1 id="title">Пхукет 2026</h1></div><button class="btn2" id="savedBtn">♡</button></header>
-<main id="main"></main>
-<nav class="nav">
-  <button data-tab="plan" class="active">⌂<br>План</button>
-  <button data-tab="map">⌖<br>Карта</button>
-  <button data-tab="food">◉<br>Еда</button>
-  <button data-tab="fav">♡<br>Сохранено</button>
-</nav>
-</div>
-<script>
-const days=[
-{date:'13 ноя',area:'Patong',title:'Прилёт и мягкая посадка',budget:'฿1.8–3.5k',transport:'Такси / пешком',stops:[['Patong Beach',7.8966,98.2959,'🏖','Первый закат без гонки'],['Bangla Road',7.8937,98.2963,'🍸','Посмотреть один раз']]},
-{date:'14 ноя',area:'Patong / Kamala',title:'Freedom Beach + sunset',budget:'฿2.5–4k',transport:'Bolt / Grab',stops:[['Freedom Beach',7.8752,98.2758,'🏖','Приехать утром'],['Secret Bay',7.9287,98.274,'🌅','Закат над морем']]},
-{date:'15 ноя',area:'Old Town',title:'Архитектура, кофе и street food',budget:'฿2–3.5k',transport:'Такси / пешком',stops:[['Soi Romanee',7.8859,98.3892,'🏛','Старый город утром'],['Campus Coffee Roaster',7.885,98.3899,'☕','Specialty coffee'],['One Chun',7.8862,98.388,'🍜','Southern Thai'],['Lard Yai',7.8848,98.3893,'🥭','Sunday Walking Street']]},
-{date:'16 ноя',area:'Kata / Karon',title:'Kata Noi и три бухты',budget:'฿2–4k',transport:'Такси',stops:[['Kata Noi',7.8067,98.2996,'🏖','Спокойнее Kata'],['Karon Viewpoint',7.7974,98.3026,'🌅','Три бухты']]},
-{date:'17 ноя',area:'Phi Phi',title:'Sunrise small-group boat',budget:'฿5–10k',transport:'Экскурсия',stops:[['Maya Bay',7.678,98.7665,'🚤','Early bird'],['Pileh Lagoon',7.6906,98.7624,'🚤','Главный highlight']]},
-{date:'18 ноя',area:'База',title:'День без KPI',budget:'฿1.5–3k',transport:'Пешком',stops:[['Relax / massage',7.8966,98.2959,'💆','Восстановление после лодки']]},
-{date:'19 ноя',area:'Kamala / Surin',title:'Coastal day',budget:'฿3–6k',transport:'Такси',stops:[['Kamala Beach',7.9536,98.283,'🏖','Спокойное утро'],['Laem Singh',7.9703,98.2802,'🏖','Маленькая бухта'],['Surin Beach',7.9754,98.2783,'🌅','Закат']]},
-{date:'20 ноя',area:'South',title:'Первый scooter road trip',budget:'฿1.8–3.5k',transport:'🛵 Скутер',stops:[['Nai Harn',7.7785,98.3065,'🏖','Главный южный пляж'],['Ya Nui',7.7686,98.3062,'🏖','Маленькая бухта'],['Windmill Viewpoint',7.7697,98.3041,'🌅','Закат без толпы Promthep']]},
-{date:'21 ноя',area:'North-West',title:'Layan → Banana → Nai Thon',budget:'฿1.5–3k',transport:'🛵 Скутер',stops:[['Layan Beach',8.038,98.283,'🏖','Простор и тишина'],['Banana Beach',8.0448,98.2768,'🏖','Hidden beach'],['Nai Thon',8.0599,98.2775,'🌅','Закат']]},
-{date:'22 ноя',area:'Bang Tao',title:'Lazy day + beach club',budget:'฿3–8k',transport:'🛵 Скутер',stops:[['Bang Tao Beach',8.0012,98.2912,'🏖','Поздний старт'],['Cherngtalay',7.991,98.303,'☕','Кафе и ужин']]},
-{date:'23 ноя',area:'East / Chalong',title:'Локальный Пхукет',budget:'฿1.5–3k',transport:'🛵 Скутер',stops:[['View Cafe at Phuket',7.913,98.347,'☕','Hilltop view'],['Mor Mu Dong',7.8435,98.3839,'🍜','Локальный southern Thai']]},
-{date:'24 ноя',area:'Similan',title:'Лучший snorkeling-day',budget:'฿6–10k',transport:'Экскурсия',stops:[['Similan Islands',8.646,97.64,'🚤','Полный морской день']]},
-{date:'25 ноя',area:'Rawai / Nai Harn',title:'Ao Sane + seafood',budget:'฿2–4.5k',transport:'🛵 Скутер',stops:[['Ao Sane',7.778,98.294,'🏖','Snorkeling с берега'],['Rawai Seafood Market',7.7753,98.3272,'🍜','Seafood вечером']]},
-{date:'26 ноя',area:'Flexible',title:'Weather buffer / Phang Nga',budget:'฿2–6k',transport:'По погоде',stops:[['Phang Nga Bay',8.275,98.5,'🚤','Опция: kayak и карсты']]},
-{date:'27 ноя',area:'База',title:'Кофе, море, аэропорт',budget:'฿1–2k',transport:'Такси',stops:[['Final beach',7.8966,98.2959,'☕','Ничего дальнего']]}
-];
-const food=[['Mor Mu Dong','Southern Thai','Chalong',7.8435,98.3839],['One Chun','Southern Thai','Old Town',7.8862,98.388],['Campus Coffee Roaster','Specialty coffee','Old Town',7.885,98.3899],['Rawai Seafood Market','Seafood','Rawai',7.7753,98.3272],['Bang Tao sunset','Beach club zone','Bang Tao',8.0012,98.2912],['Kata hillside sunset','Sunset bar zone','Kata',7.7974,98.3026]];
-let day=0; const main=document.getElementById('main'); const title=document.getElementById('title'); const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand()}
-const saved=new Set(JSON.parse(localStorage.getItem('trip_saved')||'[]'));
-const nav=(lat,lng)=>`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-function route(d){const s=d.stops,o=s[0],x=s[s.length-1],wp=s.slice(1,-1).map(v=>`${v[1]},${v[2]}`).join('|');return `https://www.google.com/maps/dir/?api=1&origin=${o[1]},${o[2]}&destination=${x[1]},${x[2]}${wp?`&waypoints=${encodeURIComponent(wp)}`:''}`}
-function persist(){localStorage.setItem('trip_saved',JSON.stringify([...saved]))}
-function plan(){const d=days[day]; title.textContent='Пхукет 2026'; main.innerHTML=`<section class="hero"><small>КОНКРЕТНАЯ ПОЕЗДКА</small><h2>13–27 ноября · вдвоём</h2><p>Пляжи, еда, road trips, экскурсии и резерв под погоду.</p><div class="tags"><span class="tag">14 дней</span><span class="tag">2-я неделя 🛵</span><span class="tag">3 ключевые экскурсии</span></div></section><div class="chips">${days.map((x,i)=>`<button class="chip ${i===day?'active':''}" data-day="${i}">${x.date}</button>`).join('')}</div><h2 class="section-title">${d.area}</h2><article class="card"><div class="row"><div><h3 style="margin:0">${d.title}</h3><p>${d.transport}</p></div><b style="color:var(--accent)">${d.budget}</b></div><div class="actions"><button class="btn" id="route">Поехать по маршруту</button><button class="btn2" id="dayMap">На карте</button></div></article>${d.stops.map((s,i)=>`<article class="card"><div class="row"><div><h3 style="margin:0">${i+1}. ${s[0]}</h3><p>${s[4]}</p></div><b>${s[3]}</b></div><div class="actions"><button class="btn2 go" data-i="${i}">Навигация</button><button class="btn2 keep" data-k="${encodeURIComponent(d.date+':'+s[0])}">${saved.has(d.date+':'+s[0])?'♥ Сохранено':'♡ Сохранить'}</button></div></article>`).join('')}`;
- document.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{day=+b.dataset.day;plan()}); document.getElementById('route').onclick=()=>window.open(route(d),'_blank'); document.getElementById('dayMap').onclick=()=>showMap(day); document.querySelectorAll('.go').forEach(b=>b.onclick=()=>{const s=d.stops[+b.dataset.i];window.open(nav(s[1],s[2]),'_blank')}); document.querySelectorAll('.keep').forEach(b=>b.onclick=()=>{const k=decodeURIComponent(b.dataset.k);saved.has(k)?saved.delete(k):saved.add(k);persist();plan()});
- if(tg?.MainButton){tg.MainButton.setText('Маршрут · '+d.date).show();tg.MainButton.onClick(()=>window.open(route(d),'_blank'))}
-}
-function showMap(filterDay=null){title.textContent=filterDay===null?'Карта поездки':'Карта · '+days[filterDay].date;if(tg?.MainButton)tg.MainButton.hide();main.innerHTML='<div id="map"></div>';setTimeout(()=>{const m=L.map('map').setView([7.93,98.33],10);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(m);const src=(filterDay===null?days:days.filter((_,i)=>i===filterDay)).flatMap(d=>d.stops.map(s=>({s,d})));src.forEach(({s,d})=>L.marker([s[1],s[2]]).addTo(m).bindPopup(`<b>${s[3]} ${s[0]}</b><br>${d.date} · ${d.area}<br><a href="${nav(s[1],s[2])}" target="_blank" style="color:#58e0b4">Поехать →</a>`));if(src.length>1)m.fitBounds(src.map(x=>[x.s[1],x.s[2]]),{padding:[30,30]})},0)}
-function foods(){title.textContent='Где есть';if(tg?.MainButton)tg.MainButton.hide();main.innerHTML='<div class="grid">'+food.map((p,i)=>`<article class="place" data-i="${i}"><h3>${p[0]}</h3><p>${p[1]}<br>${p[2]}</p><b style="color:var(--accent)">Открыть карту →</b></article>`).join('')+'</div>';document.querySelectorAll('.place').forEach(c=>c.onclick=()=>{const p=food[+c.dataset.i];window.open(nav(p[3],p[4]),'_blank')})}
-function fav(){title.textContent='Сохранено';if(tg?.MainButton)tg.MainButton.hide();const a=[];days.forEach(d=>d.stops.forEach(s=>{const k=d.date+':'+s[0];if(saved.has(k))a.push({d,s})}));main.innerHTML=a.length?a.map(x=>`<article class="card"><h3>${x.s[0]}</h3><p>${x.d.date} · ${x.d.area}</p><button class="btn2" onclick="window.open('${nav(x.s[1],x.s[2])}','_blank')">Навигация</button></article>`).join(''):'<div class="card">Пока пусто. Сохраняйте точки из плана.</div>'}
-function sw(t){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));t==='plan'?plan():t==='map'?showMap():t==='food'?foods():fav()}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>sw(b.dataset.tab));document.getElementById('savedBtn').onclick=()=>sw('fav');plan();
-</script>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">TELEGRAM MINI APP</div>
+        <h1 id="pageTitle">Пхукет</h1>
+      </div>
+      <button class="icon-btn" id="favoritesBtn" aria-label="Избранное">♡</button>
+    </header>
+
+    <main id="app"></main>
+
+    <nav class="bottom-nav" id="bottomNav">
+      <button data-tab="home" class="active"><span>⌂</span>План</button>
+      <button data-tab="map"><span>⌖</span>Карта</button>
+      <button data-tab="food"><span>◉</span>Еда</button>
+      <button data-tab="saved"><span>♡</span>Сохранено</button>
+    </nav>
+  </div>
+
+  <div class="modal" id="detailsModal">
+    <div class="modal-sheet">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div id="detailsBody"></div>
+    </div>
+  </div>
+
+  <script src="/data.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
