@@ -1,0 +1,14 @@
+{
+  "name": "trip-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "bot": "node bot.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "telegraf": "^4.16.3"
+  }
+}
